@@ -71,6 +71,7 @@
     <Compile Include="CLevelParser.cs" />
     <Compile Include="CLevelUtils.cs" />
     <Compile Include="CPoint2D.cs" />
+    <Compile Include="FileIO.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

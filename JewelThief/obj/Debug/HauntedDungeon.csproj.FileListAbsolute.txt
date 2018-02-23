@@ -25,3 +25,4 @@ H:\Work\University Programming Assignments\Y02, CS2S566 (Tool Development for Co
 H:\Work\University Programming Assignments\Y02, CS2S566 (Tool Development for Computer Games)\Assignment 2\Solution\JewelThief\obj\Debug\JewelThief.g.resources
 H:\Work\University Programming Assignments\Y02, CS2S566 (Tool Development for Computer Games)\Assignment 2\Solution\JewelThief\obj\Debug\JewelThief.Properties.Resources.resources
 H:\Work\University Programming Assignments\Y02, CS2S566 (Tool Development for Computer Games)\Assignment 2\Solution\JewelThief\obj\Debug\HauntedDungeon.csproj.GenerateResource.Cache
+H:\Work\University Programming Assignments\Y02, CS2S566 (Tool Development for Computer Games)\Assignment 2\Solution\JewelThief\obj\Debug\HauntedDungeon.csprojResolveAssemblyReference.cache

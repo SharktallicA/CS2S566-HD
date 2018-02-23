@@ -386,7 +386,6 @@ namespace WizardDungeon
             RenderGameState();
         }
 
-
         private void UpdateTime(object sender, object o)
         {
             time_ellapsed++;
@@ -445,34 +444,43 @@ namespace WizardDungeon
             btnFind.IsEnabled = !IsPlaying;
         }
 
+        /// <summary>
+        /// itmExit callback: allows user to close program through menu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExitItem_Click(object sender, RoutedEventArgs e)
         {
-            //purpose: exits the application
             this.Close();
         }
 
+        /// <summary>
+        /// btnFind callback: allows user to find a folder that contains a level
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnFind_Click(object sender, RoutedEventArgs e)
         {
-            //purpose: allows user to select a folder which contains a select
+            //initialise FileIO as OpenFileDialog
+            FileIO dlgOpen = new FileIO(DialogType.Open, "Find level", "Level File|Level.txt");
 
-            OpenFileDialog dlgOpen = new OpenFileDialog();
-            dlgOpen.FileName = "";
-            dlgOpen.Filter = "Level File|Level.txt";
-            dlgOpen.InitialDirectory = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()).ToString();
-            if (dlgOpen.ShowDialog() == true)
+            if (dlgOpen.ShowDialog())
             {
-                txtLevelDir.Text = dlgOpen.FileName.Substring(0, dlgOpen.FileName.Length - 9);
+                //if dialog successful, stri
+                txtLevelDir.Text = dlgOpen.FileName.Substring(0, dlgOpen.FileName.Length - "Level.txt".Length);
                 btnLoad_Click(null, new RoutedEventArgs());
             }
         }
 
+        /// <summary>
+        /// Draws level unto canvas and ensures all labels and item image previews are accurate
+        /// </summary>
         private void Render()
         {
             ////////////////////////////////////////////////////////////
             // clear any existing children from the canvas.
 
             cvsMainScreen.Children.Clear();
-
 
             ///////////////////////////////////////////////////////////
             // Draw the set of wall and floor tiles for the current
@@ -481,14 +489,12 @@ namespace WizardDungeon
 
             DrawLevel();
 
-
             //////////////////////////////////////////////////////////
             // Add a game state, this represents the position and velocity
             // of all the enemies and the player. Basically, anything
             // that is dynamic that we expect to move around.
 
             gameState = new CGameState(currentLevel.EnemyPositions.Count());
-
 
             ///////////////////////////////////////////////////////////
             // Set up the player to have the correct .bmp and set it to 
@@ -559,13 +565,20 @@ namespace WizardDungeon
 
             RenderGameState();
 
-            //indicate that a level has been loaded
+            ////////////////////////////////////////////////////////////
+            // Indicate that a level has been loaded
+
             lblMsg.Text = "Level loaded!";
 
-            //update level counters on form
-            DisplayLevelStats();
 
-            //add loaded textures and icon to Designer image previews
+            ////////////////////////////////////////////////////////////
+            // Update level counters on form
+
+             DisplayLevelStats();
+
+            ////////////////////////////////////////////////////////////
+            // Add loaded textures and icon to Designer image previews
+
             imgFloorTile.Source = gameTextures.FloorTexture;
             imgWallTile.Source = gameTextures.WallTexture;
             imgFire.Source = gameTextures.FireIcon;
@@ -574,10 +587,13 @@ namespace WizardDungeon
             imgGoal.Source = gameTextures.GoalIcon;
         }
 
+        /// <summary>
+        /// cvsMainScreen callback: handles executing a click-place/click-toggle task when user clicks on canvas
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cvsMainScreen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //purpose: handles user clicking on canvas
-
             if (LevelLoaded && !IsPlaying)
             {
                 //get point of click for translating into a tile coord
@@ -594,35 +610,44 @@ namespace WizardDungeon
                 else if (radFirePlacing.IsChecked == true)
                 {
                     if (!currentLevel.FirePositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.FirePositions.Add(mapPos);
-                    else MessageBox.Show("A fire has already been placed there!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    else currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
                 }
 
                 //call for game to be re-rendered to reflect changes
                 Render();
             }
-            else
-            {
-                MessageBox.Show("You must end the game before altering the level!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            else MessageBox.Show("You must end the game before altering the level!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        /// <summary>
+        /// Updates status bar labels with appropriate level statistics
+        /// </summary>
         private void DisplayLevelStats()
         {
-            //purpose: gets and displays level stats; tile & item count
+            ////////////////////////////////////////////////////////////
+            // call and utilise tile counter for floor and wall
 
-            //call and utilise tile counter for floor and wall
             lblFloors.Text = "Floors: " + currentLevel.GetTileCount(eTileType.Floor);
             lblWalls.Text = "Walls: " + currentLevel.GetTileCount(eTileType.Wall);
 
+            ////////////////////////////////////////////////////////////
             //get count from enemy and fire list container
+
             lblEnemies.Text = "Enemies: " + currentLevel.EnemyPositions.Count;
             lblFires.Text = "Fires: " + currentLevel.FirePositions.Count;
 
+            ////////////////////////////////////////////////////////////
             //make label separators on the StatusBar visible
+
             sepOne.Visibility = Visibility.Visible;
             sepTwo.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// End button clicked callback: ends the current game being played
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnEnd_Click(object sender, RoutedEventArgs e)
         {
             if (LevelLoaded &&IsPlaying)
@@ -632,10 +657,13 @@ namespace WizardDungeon
             }
         }
 
+        /// <summary>
+        /// Set button clicked callback: handles when any "Set" button is clicked under "Item Images"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnSetImage_Click(object sender, RoutedEventArgs e)
         {
-            //purpose: handles when user clicks a 'Set' button
-
             if (LevelLoaded && !IsPlaying)
             {
                 //cast local reference of sender
@@ -660,29 +688,38 @@ namespace WizardDungeon
             }
         }
 
+        /// <summary>
+        /// Attempts to get image for a tile or item
+        /// </summary>
+        /// <param name="receiver">Image object to set the source of</param>
+        /// <param name="name">Name of item that needs the image</param>
+        /// <returns>Returning true indicates getting image was successful and specific texture needs updating</returns>
         private bool GetImage(Image receiver, string name)
         {
-            //purpose: universal image getter
-            //parametres:
-                //(receiver) Image object to set the source of
-                //(name) Name of item that needs the image
-            //returning true indicates getting image was successful and specific texture needs updating
-            //returning false indicates getting image was unsuccessful or cancelled
+            //open FileIO instance as an OpenFileDialog
+            FileIO dlgOpen = new FileIO(DialogType.Open, "Find " + name + " image", "Bitmap|*.bmp|Portable Network Graphics|*.png|Other|*.*");
 
-            OpenFileDialog dlgOpenImage = new OpenFileDialog();
-            dlgOpenImage.Title = "Find " + name + " image";
-            dlgOpenImage.Filter = "Bitmap|*.bmp|Portable Network Graphics|*.png|Other|*.*";
-            if (dlgOpenImage.ShowDialog() == true)
+            if (dlgOpen.ShowDialog())
             {
-                receiver.Source = new BitmapImage(new Uri(dlgOpenImage.FileName));
+                //if dialog successful, set receiver's source as the result's filename as BitmapImage
+                receiver.Source = new BitmapImage(new Uri(dlgOpen.FileName));
                 return true;
             }
             else return false;
         }
 
+        /// <summary>
+        /// itmDesigner clicked callback: Allows Level Designer to be toggled in and out of view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DesignerItem_Click(object sender, RoutedEventArgs e)
         {
-            //purpose: allows Level Designer to be toggled in and out of view
+            ////////////////////////////////////////////////////////////
+            // Check the current checked status of itmDesigner to flip
+            // its checked status, alter visibility of the Level Designer
+            // panel, and ensure controls that can still be used to modify
+            // the level outside the Level Designer panel are under control
 
             if (itmDesigner.IsChecked)
             {
