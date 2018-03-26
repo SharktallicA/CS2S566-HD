@@ -447,20 +447,18 @@ namespace WizardDungeon
         /// <summary>
         /// itmExit callback: allows user to close program through menu
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ExitItem_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+        private void ExitItem_Click(object sender, RoutedEventArgs e) { Close(); }
 
         /// <summary>
         /// btnFind callback: allows user to find a folder that contains a level
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void btnFind_Click(object sender, RoutedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // Creates a FileIO instance to allow the user to select
+            // what level to open by allowing the selection of a 
+            // "Level.txt" file
+
             //initialise FileIO as OpenFileDialog
             FileIO dlgOpen = new FileIO(DialogType.Open, "Find level", "Level File|Level.txt");
 
@@ -590,10 +588,12 @@ namespace WizardDungeon
         /// <summary>
         /// cvsMainScreen callback: handles executing a click-place/click-toggle task when user clicks on canvas
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void cvsMainScreen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // Allows a selected tile to be manipulated based on 
+            // what item placement radio button is checked
+
             if (LevelLoaded && !IsPlaying)
             {
                 //get point of click for translating into a tile coord
@@ -611,6 +611,11 @@ namespace WizardDungeon
                 {
                     if (!currentLevel.FirePositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.FirePositions.Add(mapPos);
                     else currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                }
+                else if (radEnemyPlacing.IsChecked == true)
+                {
+                    if (!currentLevel.EnemyPositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.EnemyPositions.Add(mapPos);
+                    else currentLevel.EnemyPositions.RemoveAt(currentLevel.EnemyPositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
                 }
 
                 //call for game to be re-rendered to reflect changes
@@ -671,17 +676,29 @@ namespace WizardDungeon
 
                 //check sender's name to indicate what we're setting
                 if (btnSender.Name.Contains("Floor"))
+                {
                     if (GetImage(imgFloorTile, "floor")) gameTextures.FloorTexture = imgFloorTile.Source as BitmapImage;
+                }
                 else if (btnSender.Name.Contains("Wall"))
+                {
                     if (GetImage(imgWallTile, "wall")) gameTextures.WallTexture = imgWallTile.Source as BitmapImage;
+                }
                 else if (btnSender.Name.Contains("Player"))
+                {
                     if (GetImage(imgPlayer, "player")) gameTextures.PlayerIcon = imgPlayer.Source as BitmapImage;
+                }
                 else if (btnSender.Name.Contains("Goal"))
+                {
                     if (GetImage(imgGoal, "goal")) gameTextures.GoalIcon = imgGoal.Source as BitmapImage;
+                }
                 else if (btnSender.Name.Contains("Fire"))
+                {
                     if (GetImage(imgFire, "fire")) gameTextures.FireIcon = imgFire.Source as BitmapImage;
+                }
                 else if (btnSender.Name.Contains("Enemy"))
+                {
                     if (GetImage(imgEnemy, "enemy")) gameTextures.EnemyIcon = imgEnemy.Source as BitmapImage;
+                }
 
                 //render results
                 Render();
@@ -696,6 +713,10 @@ namespace WizardDungeon
         /// <returns>Returning true indicates getting image was successful and specific texture needs updating</returns>
         private bool GetImage(Image receiver, string name)
         {
+            ////////////////////////////////////////////////////////////
+            // Opens a FileIO dialog and attempts to get a user
+            // specified image
+            
             //open FileIO instance as an OpenFileDialog
             FileIO dlgOpen = new FileIO(DialogType.Open, "Find " + name + " image", "Bitmap|*.bmp|Portable Network Graphics|*.png|Other|*.*");
 
@@ -711,8 +732,6 @@ namespace WizardDungeon
         /// <summary>
         /// itmDesigner clicked callback: Allows Level Designer to be toggled in and out of view
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void DesignerItem_Click(object sender, RoutedEventArgs e)
         {
             ////////////////////////////////////////////////////////////
@@ -734,6 +753,16 @@ namespace WizardDungeon
                 itmNew.IsEnabled = true;
                 pnlDesigner.Visibility = Visibility.Visible;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //INSERT CHECK FOR NON-INT CHARACTERS HERE
+
+            if (LevelLoaded && !IsPlaying) currentLevel.Time = Int32.Parse(txtTimeLimit.Text);
         }
     }
 }

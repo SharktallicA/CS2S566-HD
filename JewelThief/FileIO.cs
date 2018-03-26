@@ -4,27 +4,46 @@ using System.IO;
 namespace WizardDungeon
 {
     /// <summary>
-    /// For flagging what type of dialog FileIO is
+    /// Enumeration of flags to indicate available types of dialog operations
     /// </summary>
     enum DialogType { Open, Save }
 
     /// <summary>
-    /// Reusable class for handling file input and output (load and save) operations to reduce code duplication
+    /// Universal file input and output handler (reduces code duplication)
     /// </summary>
     class FileIO
     {
-        private DialogType dlgType; //type of dialog FileIO is
-        private string dlgTitle; //title displayed on dialog
-        private string dlgFitler; //filter used on dialog
-        private string dlgDirectory; //initial directory for dialog
-        public string FileName = ""; //result of dialog
+        /// <summary>
+        /// Type of dialog FileIO is initialised to be
+        /// </summary>
+        private DialogType dlgType;
+
+        /// <summary>
+        /// Title to be displayed on dialog
+        /// </summary>
+        private string dlgTitle;
+
+        /// <summary>
+        /// Filter to be used on dialog
+        /// </summary>
+        private string dlgFitler; 
+
+        /// <summary>
+        /// Starting directory dialog will use
+        /// </summary>
+        private string dlgDirectory;
+
+        /// <summary>
+        /// Filename and path of selected file
+        /// </summary>
+        public string FileName = ""; 
 
         /// <summary>
         /// FileIO constructor
         /// </summary>
-        /// <param name="type">Dialog's type</param>
-        /// <param name="title">Dialog's title</param>
-        /// <param name="filter">Dialog's filter</param>
+        /// <param name="type">Enumerated type of dialog</param>
+        /// <param name="title">Title for dialog</param>
+        /// <param name="filter">Filter for dialog</param>
         public FileIO(DialogType type, string title = "File", string filter = "All files|*.*")
         {
             dlgType = type;

@@ -30,7 +30,7 @@
             <ToolBar.Background>
                 <ImageBrush ImageSource="pack://application:,,,/Resources/Images/imgControlBackground.png" />
             </ToolBar.Background>
-            <TextBox Name="txtLevelDir" BorderBrush="#999" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="..\..\..\Level1" Width="200
+            <TextBox Name="txtLevelDir" BorderBrush="#999" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="..\..\..\Level1" Width="400
                      " Margin="2,1,0,0" />
             <Button Name="btnFind" Content="Find Level" Click="btnFind_Click" Margin="2,1,0,0" />
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
@@ -116,21 +116,8 @@
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Time Limit" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <TextBox x:Name="txtTimeLimit" HorizontalAlignment="Right" Width="48" Height="24" Margin="0,0,4,0" />
+                        <TextBox x:Name="txtTimeLimit" HorizontalAlignment="Right" Width="48" Height="24" Margin="0,0,4,0" TextChanged="txtTimeLimit_TextChanged" />
                     </Grid>
-                </StackPanel>
-            </Expander>
-            <Expander Header="Level Difficulty" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" Margin="4">
-                <Expander.ToolTip>
-                    <StackPanel>
-                        <TextBlock FontWeight="Bold">Level Difficulty</TextBlock>
-                        <TextBlock>Allows control of level's difficulty</TextBlock>
-                    </StackPanel>
-                </Expander.ToolTip>
-                <StackPanel>
-                    <RadioButton x:Name="radEasy" VerticalContentAlignment="Center" Content="Easy" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radMedium" VerticalContentAlignment="Center" Content="Medium" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radHard" VerticalContentAlignment="Center" Content="Heavy" Margin="6,8,0,8" />
                 </StackPanel>
             </Expander>
         </StackPanel>
