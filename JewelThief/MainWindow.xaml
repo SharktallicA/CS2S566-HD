@@ -22,6 +22,10 @@
                         </StackPanel>
                     </MenuItem.ToolTip>
                 </MenuItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="85" VerticalAlignment="Center">Runtime Delta: </TextBlock>
+                    <TextBox x:Name="txtRenderDelta" Text="1" />
+                </StackPanel>
             </MenuItem>
         </Menu>
         <Canvas x:Name="cvsMainScreen" Margin="171,52,10,29" MouseLeftButtonDown="cvsMainScreen_MouseLeftButtonDown"/>

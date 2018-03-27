@@ -347,7 +347,7 @@ namespace WizardDungeon
             {
                 timer = new DispatcherTimer();
                 timer.Tick += RunGame;
-                timer.Interval = new TimeSpan(0,0,0,0,40);
+                timer.Interval = new TimeSpan(0,0,0,0,Convert.ToInt32(txtRenderDelta.Text));
 
                 countDown = new DispatcherTimer();
                 countDown.Tick += UpdateTime;
@@ -756,13 +756,15 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// 
+        /// COMMENT HERE PLZ
         /// </summary>
         private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //INSERT CHECK FOR NON-INT CHARACTERS HERE
-
-            if (LevelLoaded && !IsPlaying) currentLevel.Time = Int32.Parse(txtTimeLimit.Text);
+            if (txtTimeLimit.Text.All(char.IsDigit))
+            {
+                if (LevelLoaded && !IsPlaying) currentLevel.Time = Int32.Parse(txtTimeLimit.Text);
+            }
+            else MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
