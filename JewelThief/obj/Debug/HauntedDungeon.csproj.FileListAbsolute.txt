@@ -40,3 +40,17 @@ F:\My Documents\GitHub\CW-ToolDev2\JewelThief\obj\Debug\MainWindow.baml
 F:\My Documents\GitHub\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.g.resources
 F:\My Documents\GitHub\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.Properties.Resources.resources
 F:\My Documents\GitHub\CW-ToolDev2\JewelThief\obj\Debug\HauntedDungeon.csproj.GenerateResource.Cache
+D:\CW-ToolDev2\JewelThief\bin\Debug\JewelThief.exe.config
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.exe
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.pdb
+D:\CW-ToolDev2\JewelThief\bin\Debug\JewelThief.exe
+D:\CW-ToolDev2\JewelThief\bin\Debug\JewelThief.pdb
+D:\CW-ToolDev2\JewelThief\obj\Debug\HauntedDungeon.csprojResolveAssemblyReference.cache
+D:\CW-ToolDev2\JewelThief\obj\Debug\MainWindow.g.cs
+D:\CW-ToolDev2\JewelThief\obj\Debug\App.g.cs
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief_MarkupCompile.cache
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief_MarkupCompile.lref
+D:\CW-ToolDev2\JewelThief\obj\Debug\MainWindow.baml
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.g.resources
+D:\CW-ToolDev2\JewelThief\obj\Debug\JewelThief.Properties.Resources.resources
+D:\CW-ToolDev2\JewelThief\obj\Debug\HauntedDungeon.csproj.GenerateResource.Cache

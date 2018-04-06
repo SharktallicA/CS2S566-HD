@@ -23,7 +23,7 @@
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="85" VerticalAlignment="Center">Runtime Delta: </TextBlock>
+                    <TextBlock Width="85" VerticalAlignment="Center">Runtime Delta:</TextBlock>
                     <TextBox x:Name="txtRenderDelta" Text="1" />
                 </StackPanel>
             </MenuItem>
@@ -39,7 +39,7 @@
             <Button Name="btnFind" Content="Find Level" Click="btnFind_Click" Margin="2,1,0,0" />
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <Button Name="btnLoad" Content="Load Level" Click="btnLoad_Click" VerticalAlignment="Bottom" />
-            <Button Name="btnSave" Content="Save Level" IsEnabled="False" Margin="2,1,0,0" />
+            <Button Name="btnSave" Content="Save Level" IsEnabled="False" Click="btnSave_Click" VerticalAlignment="Bottom" />
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <Button Name="btnStart" Content="Start Game" IsEnabled="False" Click="btnStart_Click" Margin="2,1,0,0" />
             <Button Name="btnEnd" Content="End Game" Click="btnEnd_Click" IsEnabled="False" Margin="2,1,0,0" />

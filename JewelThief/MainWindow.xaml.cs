@@ -81,6 +81,15 @@ namespace WizardDungeon
         private void btnLoad_Click(object sender,RoutedEventArgs e)
         {
             ///////////////////////////////////////////////////////////
+            // Check if level exists before attempting to load it
+
+            if (!File.Exists(txtLevelDir.Text + "\\level.txt"))
+            {
+                MessageBox.Show("No level is present in the selected directory!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            ///////////////////////////////////////////////////////////
             // Get the directory where the level data is stored and 
             // load the data in. 
 
@@ -596,26 +605,50 @@ namespace WizardDungeon
 
             if (LevelLoaded && !IsPlaying)
             {
-                //get point of click for translating into a tile coord
+                ////////////////////////////////////////////////////////////
+                // get point of click for translating into a tile coord
+
                 Point p = e.GetPosition(cvsMainScreen);
                 CPoint2i pixelPos = new CPoint2i((int)p.X, (int)p.Y);
                 CPoint2i mapPos = CLevelUtils.GetTileCoordinatesFromPixel(pixelPos);
 
                 if (radTilePlacing.IsChecked == true)
                 {
-                    //toggle solid structure type (wall/floor)
+                    ////////////////////////////////////////////////////////////
+                    //
+
                     if (currentLevel.GetTileType(mapPos.X, mapPos.Y) == eTileType.Wall) currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Floor);
                     else currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Wall);
                 }
                 else if (radFirePlacing.IsChecked == true)
                 {
+                    ////////////////////////////////////////////////////////////
+                    //
+
                     if (!currentLevel.FirePositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.FirePositions.Add(mapPos);
                     else currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
                 }
                 else if (radEnemyPlacing.IsChecked == true)
                 {
+                    ////////////////////////////////////////////////////////////
+                    //
+
                     if (!currentLevel.EnemyPositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.EnemyPositions.Add(mapPos);
                     else currentLevel.EnemyPositions.RemoveAt(currentLevel.EnemyPositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                }
+                else if (radStartPos.IsChecked == true)
+                {
+                    ////////////////////////////////////////////////////////////
+                    //
+
+                    currentLevel.StartPosition = mapPos;
+                }
+                else if (radEndPos.IsChecked == true)
+                {
+                    ////////////////////////////////////////////////////////////
+                    //
+
+                    currentLevel.GoalPosition = mapPos;
                 }
 
                 //call for game to be re-rendered to reflect changes
@@ -760,11 +793,23 @@ namespace WizardDungeon
         /// </summary>
         private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (txtTimeLimit.Text.All(char.IsDigit))
+            if (LevelLoaded && !IsPlaying)
             {
-                if (LevelLoaded && !IsPlaying) currentLevel.Time = Int32.Parse(txtTimeLimit.Text);
+                int result = 0;
+                if (Int32.TryParse(txtTimeLimit.Text, out result)) currentLevel.Time = result;
+                else MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            else MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(txtLevelDir.Text + "\\level.txt"))
+            {
+                MessageBoxResult msgResult = MessageBox.Show("A level already exists in this directory. Do you wish to overwrite it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (msgResult == MessageBoxResult.No) return;
+            }
+            CLevelParser.ExportLevel(currentLevel, txtLevelDir.Text);
+            CLevelParser.ExportTextures(gameTextures, txtLevelDir.Text);
         }
     }
 }
