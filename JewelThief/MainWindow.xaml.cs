@@ -356,7 +356,7 @@ namespace WizardDungeon
             {
                 timer = new DispatcherTimer();
                 timer.Tick += RunGame;
-                timer.Interval = new TimeSpan(0,0,0,0,Convert.ToInt32(txtRenderDelta.Text));
+                timer.Interval = new TimeSpan(0,0,0,0,16);
 
                 countDown = new DispatcherTimer();
                 countDown.Tick += UpdateTime;
@@ -641,6 +641,7 @@ namespace WizardDungeon
                     ////////////////////////////////////////////////////////////
                     //
 
+
                     currentLevel.StartPosition = mapPos;
                 }
                 else if (radEndPos.IsChecked == true)
@@ -810,6 +811,17 @@ namespace WizardDungeon
             }
             CLevelParser.ExportLevel(currentLevel, txtLevelDir.Text);
             CLevelParser.ExportTextures(gameTextures, txtLevelDir.Text);
+        }
+
+        /// <summary>
+        /// Window keydown callback: prevents down arrow key from selecting controls, which might interfer with gameplay
+        /// </summary>
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Source is Canvas && e.Key == Key.Down)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

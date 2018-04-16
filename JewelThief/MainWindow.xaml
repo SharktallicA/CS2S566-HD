@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WizardDungeon"
         mc:Ignorable="d"
-        Title="Haunted Dungeon" Height="640" Width="768" KeyDown="tb_KeyDown" KeyUp="tb_KeyUp">
+        Title="Haunted Dungeon" Height="640" Width="768" KeyDown="tb_KeyDown" KeyUp="tb_KeyUp" PreviewKeyDown="Window_PreviewKeyDown">
     <Grid Background="#FAFAFA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Menu x:Name="barMenu" IsMainMenu="True" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent">
             <MenuItem x:Name="itmFile" Header="File">
@@ -22,10 +22,6 @@
                         </StackPanel>
                     </MenuItem.ToolTip>
                 </MenuItem>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="85" VerticalAlignment="Center">Runtime Delta:</TextBlock>
-                    <TextBox x:Name="txtRenderDelta" Text="1" />
-                </StackPanel>
             </MenuItem>
         </Menu>
         <Canvas x:Name="cvsMainScreen" Margin="171,52,10,29" MouseLeftButtonDown="cvsMainScreen_MouseLeftButtonDown"/>
