@@ -5,42 +5,76 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WizardDungeon"
         mc:Ignorable="d"
-        Title="Haunted Dungeon" Height="640" Width="768" KeyDown="tb_KeyDown" KeyUp="tb_KeyUp" PreviewKeyDown="Window_PreviewKeyDown">
+        Title="Haunted Dungeon Level Editor" Height="768" Width="1024" KeyDown="tb_KeyDown" KeyUp="tb_KeyUp" PreviewKeyDown="Window_PreviewKeyDown" WindowStartupLocation="CenterScreen">
+    
     <Grid Background="#FAFAFA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Menu x:Name="barMenu" IsMainMenu="True" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent">
+        
+        <Menu x:Name="barMenu" IsMainMenu="True" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" PreviewKeyDown="barMenu_PreviewKeyDown">
+            
             <MenuItem x:Name="itmFile" Header="File">
-                <MenuItem x:Name="itmNew" Header="New Level..." />
+                
+                <MenuItem x:Name="itmOpen" Header="Open Level..." Click="itmOpen_Click" />
+                <MenuItem x:Name="itmSave" Header="Save Level..." Click="itmSave_Click" />
                 <Separator Style="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" />
                 <MenuItem x:Name="itmExit" Header="_Exit" Click="ExitItem_Click" />
+                
             </MenuItem>
-            <MenuItem x:Name="itmView" Header="View">
-                <MenuItem x:Name="itmDesigner" Header="Level Designer" IsChecked="True"  Click="DesignerItem_Click">
+            <MenuItem x:Name="itmOptions" Header="Options">
+                
+                <MenuItem x:Name="itmDisableGame" Header="Disable gameplay functionality" IsChecked="True" ToolTipService.ShowDuration="12000" Click="itmDisableGame_Click">
                     <MenuItem.ToolTip>
-                        <StackPanel>
-                            <TextBlock>Toggles the Level Designer functionality</TextBlock>
-                            <TextBlock>Turning this off will hide all level and item modification tools and disables the ability to create blank levels</TextBlock>
-                        </StackPanel>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock>Checking this option will prevent the user from overlapping entities on a single tile.</TextBlock>
+                                <TextBlock>Unchecking it will allow it and could potentially lead to application crashes.</TextBlock>
+                            </StackPanel>
+                        </ToolTip>
                     </MenuItem.ToolTip>
+                    
+                </MenuItem>
+                <MenuItem x:Name="itmPreventOverlap" Header="Prevent multiple entities overlapping" IsChecked="True" ToolTipService.ShowDuration="12000" Click="itmPreventOverlap_Click">
+                    
+                    <MenuItem.ToolTip>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock>Checking this option will prevent the user from overlapping entities on a single tile.</TextBlock>
+                                <TextBlock>Unchecking it will allow it and could potentially lead to application crashes.</TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </MenuItem.ToolTip>
+                    
                 </MenuItem>
             </MenuItem>
+            <MenuItem x:Name="itmHelp" Header="Help">
+                
+                <MenuItem x:Name="itmAbout" Header="About..." Click="itmAbout_Click" />
+                
+            </MenuItem>
+            
         </Menu>
+        
         <Canvas x:Name="cvsMainScreen" Margin="171,52,10,29" MouseLeftButtonDown="cvsMainScreen_MouseLeftButtonDown"/>
+        
         <ToolBar x:Name="barTool" VerticalAlignment="Top" Height="28" Margin="-3,19
                  ,0,0" ToolBarTray.IsLocked="True">
+            
             <ToolBar.Background>
                 <ImageBrush ImageSource="pack://application:,,,/Resources/Images/imgControlBackground.png" />
             </ToolBar.Background>
             <TextBox Name="txtLevelDir" BorderBrush="#999" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="..\..\..\Level1" Width="400
                      " Margin="2,1,0,0" />
-            <Button Name="btnFind" Content="Find Level" Click="btnFind_Click" Margin="2,1,0,0" />
+            <Button Name="btnFind" Content="Find Level" Click="btnFind_Click" VerticalAlignment="Bottom" Height="22" />
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-            <Button Name="btnLoad" Content="Load Level" Click="btnLoad_Click" VerticalAlignment="Bottom" />
-            <Button Name="btnSave" Content="Save Level" IsEnabled="False" Click="btnSave_Click" VerticalAlignment="Bottom" />
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-            <Button Name="btnStart" Content="Start Game" IsEnabled="False" Click="btnStart_Click" Margin="2,1,0,0" />
-            <Button Name="btnEnd" Content="End Game" Click="btnEnd_Click" IsEnabled="False" Margin="2,1,0,0" />
+            <Button Name="btnLoad" Content="Load Level" Click="btnLoad_Click" VerticalAlignment="Stretch" Margin="0,1,0,0" />
+            <Button Name="btnSave" Content="Save Level" IsEnabled="False" Click="btnSave_Click" VerticalAlignment="Top" Margin="0,1,0,0" />
+            <Separator x:Name="sepGame" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Hidden" />
+            <Button Name="btnStart" Content="Start Game" IsEnabled="False" Click="btnStart_Click" Margin="2,1,0,0" Visibility="Hidden" />
+            <Button Name="btnEnd" Content="End Game" Click="btnEnd_Click" IsEnabled="False" Margin="2,1,0,0" Visibility="Hidden" />
+            
         </ToolBar>
+        
         <StatusBar Height="24" Background="#EFEFEF" VerticalAlignment="Bottom">
+            
             <TextBlock x:Name="lblMsg" FontWeight="SemiBold" Text="No level loaded!" Margin="2,0,0,0" />
             <Separator x:Name="sepOne" Visibility="Hidden" Style="{StaticResource {x:Static StatusBar.SeparatorStyleKey}}" />
             <TextBlock x:Name="lblFloors" Text="" />
@@ -48,9 +82,13 @@
             <Separator x:Name="sepTwo" Visibility="Hidden" Style="{StaticResource {x:Static StatusBar.SeparatorStyleKey}}" />
             <TextBlock x:Name="lblFires" Text="" />
             <TextBlock x:Name="lblEnemies" Text="" />
+            
         </StatusBar>
+        
         <StackPanel x:Name="pnlDesigner" Background="#EFEFEF" HorizontalAlignment="Left" Width="166" Margin="0,47,0,24">
-            <Expander Header="Item Images"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" Margin="4">
+            
+            <Expander Header="Item Images"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#EFEFEF" Margin="4">
+                
                 <Expander.ToolTip>
                     <StackPanel>
                         <TextBlock FontWeight="Bold">Item Images</TextBlock>
@@ -59,38 +97,50 @@
                 </Expander.ToolTip>
                 <StackPanel>
                     <Grid>
-                        <TextBlock Text="Floor Tile" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetFloor" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" Click="btnSetImage_Click" />
-                        <Image x:Name="imgFloorTile" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="15*"/>
+                            <ColumnDefinition Width="134*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Floor Tile" Padding="8" Height="32" Margin="0,0,74,0" Grid.ColumnSpan="3" />
+                        <Button x:Name="btnSetFloor" Content="Set" VerticalContentAlignment="Center" Margin="75.814,4,33,4" IsEnabled="False" Click="btnSetImage_Click" Grid.Column="2" />
+                        <Image x:Name="imgFloorTile" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,4,4,4" Grid.Column="2" />
                     </Grid>
                     <Grid>
-                        <TextBlock Text="Wall Tile" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetWall" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" Click="btnSetImage_Click" />
-                        <Image x:Name="imgWallTile" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Wall Tile" Padding="8" Height="32" Margin="0,0,35.102,0" />
+                        <Button x:Name="btnSetWall" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" Click="btnSetImage_Click" Grid.ColumnSpan="2" IsEnabled="False" />
+                        <Image x:Name="imgWallTile" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,4,4,4" Grid.Column="1" />
                     </Grid>
                     <Grid>
                         <TextBlock Text="Player" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetPlayer" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" Click="btnSetImage_Click" />
+                        <Button x:Name="btnSetPlayer" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" IsEnabled="False" Click="btnSetImage_Click" />
                         <Image x:Name="imgPlayer" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
                     </Grid>
                     <Grid>
                         <TextBlock Text="Enemy" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetEnemy" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" Click="btnSetImage_Click" />
+                        <Button x:Name="btnSetEnemy" Content="Set" VerticalContentAlignment="Center" Margin="98,4,33,4" IsEnabled="False" Click="btnSetImage_Click" />
                         <Image x:Name="imgEnemy" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
                     </Grid>
                     <Grid>
                         <TextBlock Text="Fire" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetFire" Content="Set" Margin="98,4,33,4" Click="btnSetImage_Click" />
+                        <Button x:Name="btnSetFire" Content="Set" Margin="98,4,33,4" Click="btnSetImage_Click" IsEnabled="False" />
                         <Image x:Name="imgFire" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
                     </Grid>
                     <Grid>
                         <TextBlock Text="Goal" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <Button x:Name="btnSetGoal" Content="Set" Margin="98,4,33,4" Click="btnSetImage_Click" />
+                        <Button x:Name="btnSetGoal" Content="Set" Margin="98,4,33,4" Click="btnSetImage_Click" IsEnabled="False" />
                         <Image x:Name="imgGoal" Source="pack://application:,,,/Resources/Images/imgNoImage.png" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,0,4,0" />
                     </Grid>
                 </StackPanel>
+                
             </Expander>
-            <Expander Header="Item Placement"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" Margin="4">
+            
+            <Expander Header="Item Placement"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#EFEFEF" Margin="4">
+                
                 <Expander.ToolTip>
                     <StackPanel>
                         <TextBlock FontWeight="Bold">Item Placement</TextBlock>
@@ -98,15 +148,18 @@
                     </StackPanel>
                 </Expander.ToolTip>
                 <StackPanel>
-                    <RadioButton x:Name="radTilePlacing" VerticalContentAlignment="Center" Content="Tile placing" Margin="6,8,0,8" IsChecked="True" />
-                    <RadioButton x:Name="radFirePlacing" VerticalContentAlignment="Center" Content="Fire placing" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radEnemyPlacing" VerticalContentAlignment="Center" Content="Enemy placing" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radStartPos" VerticalContentAlignment="Center" Content="Start position" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radEndPos" VerticalContentAlignment="Center" Content="End position" Margin="6,8,0,8" />
-                    <RadioButton x:Name="radOff" VerticalContentAlignment="Center" Content="Off" Margin="6,8,0,8" />
+                    <RadioButton x:Name="radOff" VerticalContentAlignment="Center" Content="None" Margin="6,8,0,8" IsEnabled="False" />
+                    <RadioButton x:Name="radTilePlacing" VerticalContentAlignment="Center" Content="Tiles (wall/floor)" Margin="6,8,0,8" IsChecked="True" IsEnabled="False" />
+                    <RadioButton x:Name="radFirePlacing" VerticalContentAlignment="Center" Content="Fires" Margin="6,8,0,8" IsEnabled="False" />
+                    <RadioButton x:Name="radEnemyPlacing" VerticalContentAlignment="Center" Content="Enemies" Margin="6,8,0,8" IsEnabled="False" />
+                    <RadioButton x:Name="radStartPos" VerticalContentAlignment="Center" Content="Start position" Margin="6,8,0,8" IsEnabled="False" />
+                    <RadioButton x:Name="radEndPos" VerticalContentAlignment="Center" Content="Goal position" Margin="6,8,0,8" IsEnabled="False" />
                 </StackPanel>
+                
             </Expander>
-            <Expander Header="Level Properties"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Transparent" Margin="4">
+            
+            <Expander Header="Level Properties"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#EFEFEF" Margin="4">
+                
                 <Expander.ToolTip>
                     <StackPanel>
                         <TextBlock FontWeight="Bold">Level Properties</TextBlock>
@@ -116,10 +169,20 @@
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Time Limit" Padding="8" Height="32" Margin="0,0,74,0" />
-                        <TextBox x:Name="txtTimeLimit" HorizontalAlignment="Right" Width="48" Height="24" Margin="0,0,4,0" TextChanged="txtTimeLimit_TextChanged" />
+                        <TextBox x:Name="txtTimeLimit" HorizontalAlignment="Right" Width="48" Height="24" Margin="0,4,4,0" TextChanged="txtTimeLimit_TextChanged" VerticalAlignment="Top" IsEnabled="False" />
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="Size (X, Y)" Padding="8" Height="32" Margin="0,0,74,0" />
+                        <TextBox x:Name="txtMapSizeX" HorizontalAlignment="Center" Width="24" Height="24" Margin="70,4,62,0" VerticalAlignment="Top" TextChanged="txtMapSizeX_TextChanged" IsEnabled="False" />
+                        <TextBox x:Name="txtMapSizeY" HorizontalAlignment="Right" Width="24" Height="24" Margin="0,4,33,0" VerticalAlignment="Top" TextChanged="txtMapSizeY_TextChanged" IsEnabled="False" />
+                        <Button x:Name="btnSetSize" Content="Set" VerticalContentAlignment="Center" Width="24" Height="24" Margin="128,4,4,4" Click="btnSetSize_Click" IsEnabled="False" />
                     </Grid>
                 </StackPanel>
+                
             </Expander>
+            
         </StackPanel>
+        
     </Grid>
+    
 </Window>

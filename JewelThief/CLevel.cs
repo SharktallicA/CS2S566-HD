@@ -121,7 +121,94 @@ namespace WizardDungeon
             }
             else
             {
-                throw new NotImplementedException();
+                ////////////////////////////////////////////////////////////
+                // If a game is loaded, proceed by first creating a copy of 
+                // the current map
+
+                eTileType[,] previousMap = m_levelMap;
+
+                ////////////////////////////////////////////////////////////
+                // Initialise the new map
+
+                m_levelMap = new eTileType[sizeX, sizeY];
+
+                for (int y = 0; y < sizeY; y++)
+                {
+                    for (int x = 0; x < sizeX; x++)
+                    {
+                        ////////////////////////////////////////////////////////////
+                        // Set new tile as a floor for a failsafe
+
+                        m_levelMap[x, y] = eTileType.Floor;
+
+                        ////////////////////////////////////////////////////////////
+                        // See if previous map data can be reused
+
+                        if (x < previousMap.GetLength(0) && y < previousMap.GetLength(1)) m_levelMap[x, y] = previousMap[x, y];
+                    }
+                }
+
+                ////////////////////////////////////////////////////////////
+                // Flag for use with entity out of bound issue checking:
+                // Ie, suppose the map is reduced in size and some fires or enemies
+                // are outside the new borders, they'd need to be removed
+
+                bool complete = false;
+
+                ////////////////////////////////////////////////////////////
+                // Check if any enemies are now out of bounds due to the
+                // map size change
+
+                while (!complete)
+                {
+                    if (EnemyPositions.Count == 0) break; //if there are no enemies, break out of the checking process
+
+                    for (int i = 0; i < EnemyPositions.Count; i++)
+                    {
+                        if (EnemyPositions[i].X >= sizeX || EnemyPositions[i].Y >= sizeY)
+                        {
+                            EnemyPositions.RemoveAt(i);
+                            complete = false;
+                            break;
+                        }
+                        else complete = true;
+                    }
+                }
+
+                ////////////////////////////////////////////////////////////
+                // Reset flag
+
+                complete = false;
+
+                ////////////////////////////////////////////////////////////
+                // Check if any fires are now out of bounds due to the
+                // map size change
+
+                while (!complete)
+                {
+                    if (FirePositions.Count == 0) break; //if there are no fires, break out of the checking process
+
+                    for (int i = 0; i < FirePositions.Count; i++)
+                    {
+                        if (FirePositions[i].X >= sizeX || FirePositions[i].Y >= sizeY)
+                        {
+                            FirePositions.RemoveAt(i);
+                            complete = false;
+                            break;
+                        }
+                        else complete = true;
+                    }
+                }
+
+                ////////////////////////////////////////////////////////////
+                // Check if start position is now out of bounds
+
+                if (StartPosition != null) if (StartPosition.X >= sizeX || StartPosition.Y >= sizeY) StartPosition = null;
+
+                ////////////////////////////////////////////////////////////
+                // Check if end position is now out of bounds
+
+                if (GoalPosition != null) if (GoalPosition.X >= sizeX || GoalPosition.Y >= sizeY) GoalPosition = null;
             }
 
             Width = sizeX;

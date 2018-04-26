@@ -5,9 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Threading;
-using Microsoft.Win32;
 using System.IO;
 using System.Windows.Media.Imaging;
+using JewelThief;
 
 namespace WizardDungeon
 {
@@ -81,6 +81,15 @@ namespace WizardDungeon
         private void btnLoad_Click(object sender,RoutedEventArgs e)
         {
             ///////////////////////////////////////////////////////////
+            // Check if text box input is valid before attempting to load
+
+            if (txtLevelDir.Text == "")
+            {
+                MessageBox.Show("Please specify a valid directory and file!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ///////////////////////////////////////////////////////////
             // Check if level exists before attempting to load it
 
             if (!File.Exists(txtLevelDir.Text + "\\level.txt"))
@@ -97,15 +106,27 @@ namespace WizardDungeon
             currentLevel = CLevelParser.ImportLevel(fileDir);
             gameTextures = CLevelParser.ImportTextures(fileDir);
 
-            //enable certain controls now that level is loaded
+            ///////////////////////////////////////////////////////////
+            // Enable certain controls now that level is loaded
+
             btnStart.IsEnabled = true;
             btnSave.IsEnabled = true;
 
+            ///////////////////////////////////////////////////////////
             // Call unified/custom render function (centralised in Render() to cut down on code duplication)
+
             Render();
 
-            //display level's time limit in text box
+            ///////////////////////////////////////////////////////////
+            // Display level's time limit in text box
+
             txtTimeLimit.Text = currentLevel.Time.ToString();
+
+            ///////////////////////////////////////////////////////////
+            // Display level's size in text boxes
+
+            txtMapSizeX.Text = currentLevel.Width.ToString();
+            txtMapSizeY.Text = currentLevel.Height.ToString();
 
             //flag level as loaded
             LevelLoaded = true;
@@ -261,10 +282,13 @@ namespace WizardDungeon
 
             goalImg.Source  = gameTextures.GoalIcon;
 
-            CPoint2i GoalPosition = CLevelUtils.GetPixelFromTileCoordinates(new CPoint2i(currentLevel.GoalPosition.X, currentLevel.GoalPosition.Y));
-
-            Canvas.SetLeft(goalImg, GoalPosition.X);
-            Canvas.SetTop (goalImg, GoalPosition.Y);
+            try
+            {
+                CPoint2i GoalPosition = CLevelUtils.GetPixelFromTileCoordinates(new CPoint2i(currentLevel.GoalPosition.X, currentLevel.GoalPosition.Y)); 
+                Canvas.SetLeft(goalImg, GoalPosition.X);
+                Canvas.SetTop (goalImg, GoalPosition.Y);
+            }
+            catch { }
 
             cvsMainScreen.Children.Add(goalImg);
         }
@@ -366,7 +390,25 @@ namespace WizardDungeon
             countDown.Start();
             timer.Start();
 
+            /////////////////////////////////////////////////////////////
+            // Disable designer elements
 
+            btnSetEnemy.IsEnabled = false;
+            btnSetFire.IsEnabled = false;
+            btnSetFloor.IsEnabled = false;
+            btnSetGoal.IsEnabled = false;
+            btnSetPlayer.IsEnabled = false;
+            btnSetWall.IsEnabled = false;
+            btnSetSize.IsEnabled = false;
+            radEndPos.IsEnabled = false;
+            radEnemyPlacing.IsEnabled = false;
+            radFirePlacing.IsEnabled = false;
+            radOff.IsEnabled = false;
+            radStartPos.IsEnabled = false;
+            radTilePlacing.IsEnabled = false;
+            txtMapSizeY.IsEnabled = false;
+            txtMapSizeX.IsEnabled = false;
+            txtTimeLimit.IsEnabled = false;
 
             /////////////////////////////////////////////////////////////
             // Make some of the elements on screen disabled so that the
@@ -445,10 +487,10 @@ namespace WizardDungeon
             lblMsg.Text = message;
             timer.Stop();
             IsPlaying = false;
-            txtLevelDir.IsEnabled   = !IsPlaying;
-            btnStart.IsEnabled      = !IsPlaying;
-            btnLoad.IsEnabled       = !IsPlaying;
-            btnSave.IsEnabled       = !IsPlaying;
+            txtLevelDir.IsEnabled = !IsPlaying;
+            btnStart.IsEnabled = !IsPlaying;
+            btnLoad.IsEnabled = !IsPlaying;
+            btnSave.IsEnabled = !IsPlaying;
             btnEnd.IsEnabled = IsPlaying;
             btnFind.IsEnabled = !IsPlaying;
         }
@@ -471,11 +513,11 @@ namespace WizardDungeon
             //initialise FileIO as OpenFileDialog
             FileIO dlgOpen = new FileIO(DialogType.Open, "Find level", "Level File|Level.txt");
 
-            if (dlgOpen.ShowDialog())
+            if (dlgOpen.ShowDialog()) //attempt successful use of dialog
             {
                 //if dialog successful, stri
                 txtLevelDir.Text = dlgOpen.FileName.Substring(0, dlgOpen.FileName.Length - "Level.txt".Length);
-                btnLoad_Click(null, new RoutedEventArgs());
+                lblMsg.Text = "Level selected but not loaded!";
             }
         }
 
@@ -577,11 +619,30 @@ namespace WizardDungeon
 
             lblMsg.Text = "Level loaded!";
 
+            /////////////////////////////////////////////////////////////
+            // Enable designer elements
+
+            btnSetEnemy.IsEnabled = true;
+            btnSetFire.IsEnabled = true;
+            btnSetFloor.IsEnabled = true;
+            btnSetGoal.IsEnabled = true;
+            btnSetPlayer.IsEnabled = true;
+            btnSetWall.IsEnabled = true;
+            btnSetSize.IsEnabled = true;
+            radEndPos.IsEnabled = true;
+            radEnemyPlacing.IsEnabled = true;
+            radFirePlacing.IsEnabled = true;
+            radOff.IsEnabled = true;
+            radStartPos.IsEnabled = true;
+            radTilePlacing.IsEnabled = true;
+            txtMapSizeY.IsEnabled = true;
+            txtMapSizeX.IsEnabled = true;
+            txtTimeLimit.IsEnabled = true;
 
             ////////////////////////////////////////////////////////////
             // Update level counters on form
 
-             DisplayLevelStats();
+            DisplayLevelStats();
 
             ////////////////////////////////////////////////////////////
             // Add loaded textures and icon to Designer image previews
@@ -603,7 +664,7 @@ namespace WizardDungeon
             // Allows a selected tile to be manipulated based on 
             // what item placement radio button is checked
 
-            if (LevelLoaded && !IsPlaying)
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 ////////////////////////////////////////////////////////////
                 // get point of click for translating into a tile coord
@@ -615,47 +676,158 @@ namespace WizardDungeon
                 if (radTilePlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    //
+                    // 
 
                     if (currentLevel.GetTileType(mapPos.X, mapPos.Y) == eTileType.Wall) currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Floor);
-                    else currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Wall);
+                    else
+                    {
+                        if (ReplaceIfFireExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos))
+                        {
+                            currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Wall);
+                        }
+                    }
                 }
                 else if (radFirePlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    //
+                    // 
 
-                    if (!currentLevel.FirePositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.FirePositions.Add(mapPos);
-                    else currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                    if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
+                    {
+                        if (!currentLevel.FirePositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.FirePositions.Add(mapPos);
+                        else currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                    }
                 }
                 else if (radEnemyPlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
                     //
 
-                    if (!currentLevel.EnemyPositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.EnemyPositions.Add(mapPos);
-                    else currentLevel.EnemyPositions.RemoveAt(currentLevel.EnemyPositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                    if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
+                    {
+                        if (!currentLevel.EnemyPositions.Exists(itm => itm.X == mapPos.X && itm.Y == mapPos.Y)) currentLevel.EnemyPositions.Add(mapPos);
+                        else currentLevel.EnemyPositions.RemoveAt(currentLevel.EnemyPositions.FindIndex(itm => itm.X == mapPos.X && itm.Y == mapPos.Y));
+                    }
                 }
                 else if (radStartPos.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
                     //
 
-
-                    currentLevel.StartPosition = mapPos;
+                    if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos))
+                    { 
+                        currentLevel.StartPosition = mapPos;
+                    }
                 }
                 else if (radEndPos.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
                     //
 
-                    currentLevel.GoalPosition = mapPos;
+                    if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
+                    {
+                        currentLevel.GoalPosition = mapPos;
+                    }
                 }
 
                 //call for game to be re-rendered to reflect changes
                 Render();
             }
             else MessageBox.Show("You must end the game before altering the level!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        /// <summary>
+        /// Checks and prompts if a wall tile exists in the position specified
+        /// </summary>
+        /// <param name="posToCheck">Map position that is to be checked</param>
+        /// <returns>Returns a boolean that flags whether a wall tile exists at the specified pos or not</returns>
+        private bool CheckIfWallExistsAtPos(CPoint2i posToCheck)
+        {
+            //bypass method if prevent overlapping is disabled
+            if (itmPreventOverlap.IsChecked == false) return false;
+
+            bool result = false;
+            if (currentLevel.GetTileType(posToCheck.X, posToCheck.Y) == eTileType.Wall) result = true;
+            if (result) MessageBox.Show("You cannot place this item or entity on a wall tile!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return result;
+        }
+
+        /// <summary>
+        /// Checks and prompts if a fire entity exists in the position specified
+        /// </summary>
+        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <returns>Returns a boolean that flags if the user wishes to continue the placement of the new item or entity or not</returns>
+        private bool ReplaceIfFireExistsAtPos(CPoint2i posToCheck)
+        {
+            //bypass method if prevent overlapping is disabled
+            if (itmPreventOverlap.IsChecked == false) return true;
+
+            if (currentLevel.FirePositions.Exists(itm => itm.X == posToCheck.X && itm.Y == posToCheck.Y))
+            {
+                MessageBoxResult msgResult = MessageBox.Show("A fire entity exists at the position you want to place this item or entity at. Do you want to replace it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (msgResult == MessageBoxResult.Yes)
+                {
+                    currentLevel.FirePositions.RemoveAt(currentLevel.FirePositions.FindIndex(itm => itm.X == posToCheck.X && itm.Y == posToCheck.Y));
+                    return true;
+                }
+                else return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks and prompts if a enemy entity exists in the position specified
+        /// </summary>
+        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <returns>Returns a boolean that flags if the user wishes to continue the placement of the new item or entity or not</returns>
+        private bool ReplaceIfEnemyExistsAtPos(CPoint2i posToCheck)
+        {
+            //bypass method if prevent overlapping is disabled
+            if (itmPreventOverlap.IsChecked == false) return true;
+
+            if (currentLevel.EnemyPositions.Exists(itm => itm.X == posToCheck.X && itm.Y == posToCheck.Y))
+            {
+                MessageBoxResult msgResult = MessageBox.Show("An enemy entity exists at the position you want to place this item or entity at. Do you want to replace it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (msgResult == MessageBoxResult.Yes)
+                {
+                    currentLevel.EnemyPositions.RemoveAt(currentLevel.EnemyPositions.FindIndex(itm => itm.X == posToCheck.X && itm.Y == posToCheck.Y));
+                    return true;
+                }
+                else return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks and prompts if the start position exists in the position specified
+        /// </summary>
+        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <returns>Returns a boolean that flags whether a start position exists at the specified pos or not</returns>
+        private bool CheckIfStartExistsAtPos(CPoint2i posToCheck)
+        {
+            //bypass method if prevent overlapping is disabled
+            if (itmPreventOverlap.IsChecked == false) return false;
+
+            bool result = false;
+            if (currentLevel.StartPosition.X == posToCheck.X && currentLevel.StartPosition.Y == posToCheck.Y) result = true;
+            if (result) MessageBox.Show("Cannot proceed - removing the start position completely from the game by placing another entity on it will cause the application to crash!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return result;
+        }
+
+        /// <summary>
+        /// Checks and prompts if the goal position exists in the position specified
+        /// </summary>
+        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <returns>Returns a boolean that flags whether a goal position exists at the specified pos or not</returns>
+        private bool CheckIfGoalExistsAtPos(CPoint2i posToCheck)
+        {
+            //bypass method if prevent overlapping is disabled
+            if (itmPreventOverlap.IsChecked == false) return false;
+
+            bool result = false;
+            if (currentLevel.GoalPosition.X == posToCheck.X && currentLevel.GoalPosition.Y == posToCheck.Y) result = true;
+            if (result) MessageBox.Show("Cannot proceed - removing the goal position completely from the game by placing another entity on it will cause the application to crash!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return result;
         }
 
         /// <summary>
@@ -693,17 +865,35 @@ namespace WizardDungeon
             {
                 Render();
                 EndGame(null, "Game ended at user request");
+
+                /////////////////////////////////////////////////////////////
+                // Enable designer elements
+
+                btnSetEnemy.IsEnabled = true;
+                btnSetFire.IsEnabled = true;
+                btnSetFloor.IsEnabled = true;
+                btnSetGoal.IsEnabled = true;
+                btnSetPlayer.IsEnabled = true;
+                btnSetWall.IsEnabled = true;
+                btnSetSize.IsEnabled = true;
+                radEndPos.IsEnabled = true;
+                radEnemyPlacing.IsEnabled = true;
+                radFirePlacing.IsEnabled = true;
+                radOff.IsEnabled = true;
+                radStartPos.IsEnabled = true;
+                radTilePlacing.IsEnabled = true;
+                txtMapSizeY.IsEnabled = true;
+                txtMapSizeX.IsEnabled = true;
+                txtTimeLimit.IsEnabled = true;
             }
         }
 
         /// <summary>
         /// Set button clicked callback: handles when any "Set" button is clicked under "Item Images"
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void btnSetImage_Click(object sender, RoutedEventArgs e)
         {
-            if (LevelLoaded && !IsPlaying)
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 //cast local reference of sender
                 Button btnSender = sender as Button;
@@ -750,13 +940,17 @@ namespace WizardDungeon
             ////////////////////////////////////////////////////////////
             // Opens a FileIO dialog and attempts to get a user
             // specified image
-            
-            //open FileIO instance as an OpenFileDialog
+
+            ////////////////////////////////////////////////////////////
+            // Open FileIO instance as an OpenFileDialog
+
             FileIO dlgOpen = new FileIO(DialogType.Open, "Find " + name + " image", "Bitmap|*.bmp|Portable Network Graphics|*.png|Other|*.*");
 
-            if (dlgOpen.ShowDialog())
+            if (dlgOpen.ShowDialog()) //attempt successful use of dialog
             {
-                //if dialog successful, set receiver's source as the result's filename as BitmapImage
+                ////////////////////////////////////////////////////////////
+                // If dialog successful, set receiver's source as the result's filename as BitmapImage
+
                 receiver.Source = new BitmapImage(new Uri(dlgOpen.FileName));
                 return true;
             }
@@ -764,63 +958,210 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// itmDesigner clicked callback: Allows Level Designer to be toggled in and out of view
+        /// COMMENT HERE PLZ
         /// </summary>
-        private void DesignerItem_Click(object sender, RoutedEventArgs e)
+        private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ////////////////////////////////////////////////////////////
-            // Check the current checked status of itmDesigner to flip
-            // its checked status, alter visibility of the Level Designer
-            // panel, and ensure controls that can still be used to modify
-            // the level outside the Level Designer panel are under control
-
-            if (itmDesigner.IsChecked)
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
-                itmDesigner.IsChecked = false;
-                itmNew.IsEnabled = false; //disallow accidental level creation when user cannot modify anything
-                pnlDesigner.Visibility = Visibility.Hidden;
-                radOff.IsChecked = true; //disallow accidental modification
-            }
-            else
-            {
-                itmDesigner.IsChecked = true;
-                itmNew.IsEnabled = true;
-                pnlDesigner.Visibility = Visibility.Visible;
+                int result = 0;
+                if (int.TryParse(txtTimeLimit.Text, out result))
+                {
+                    currentLevel.Time = result;
+                }
+                else
+                {
+                    MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    txtTimeLimit.Text = currentLevel.Time.ToString();
+                }
             }
         }
 
         /// <summary>
         /// COMMENT HERE PLZ
         /// </summary>
-        private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (LevelLoaded && !IsPlaying)
-            {
-                int result = 0;
-                if (Int32.TryParse(txtTimeLimit.Text, out result)) currentLevel.Time = result;
-                else MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (File.Exists(txtLevelDir.Text + "\\level.txt"))
+            //TODO: ENSURE SAVE CANNOT BE MADE IF NO START OR GOAL POSITION IS SET
+            
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
-                MessageBoxResult msgResult = MessageBox.Show("A level already exists in this directory. Do you wish to overwrite it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (msgResult == MessageBoxResult.No) return;
+                if (txtLevelDir.Text == "")
+                {
+                    MessageBox.Show("Please specify a valid directory and file!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (File.Exists(txtLevelDir.Text + "\\level.txt"))
+                {
+                    MessageBoxResult msgResult = MessageBox.Show("A level already exists in this directory. Do you wish to overwrite it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (msgResult == MessageBoxResult.No) return;
+                }
+                CLevelParser.ExportLevel(currentLevel, txtLevelDir.Text);
+                CLevelParser.ExportTextures(gameTextures, txtLevelDir.Text);
+                lblMsg.Text = "Level saved!";
             }
-            CLevelParser.ExportLevel(currentLevel, txtLevelDir.Text);
-            CLevelParser.ExportTextures(gameTextures, txtLevelDir.Text);
         }
 
         /// <summary>
         /// Window keydown callback: prevents down arrow key from selecting controls, which might interfer with gameplay
         /// </summary>
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e) { if (e.Source is Canvas && e.Key == Key.Down) e.Handled = true; }
+
+        private void barMenu_PreviewKeyDown(object sender, KeyEventArgs e) { if (e.Source is Canvas && e.Key == Key.Down) e.Handled = true; }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void itmAbout_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Source is Canvas && e.Key == Key.Down)
+            AboutWindow aboutDialog = new AboutWindow();
+            aboutDialog.ShowDialog();
+        }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void btnSetSize_Click(object sender, RoutedEventArgs e)
+        {
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
-                e.Handled = true;
+                MessageBoxResult msgResult = MessageBox.Show("Performing this action can potentially lead to entities being removed from the board. Do you wish to proceed?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (msgResult == MessageBoxResult.No) return;
+                else
+                {
+                    currentLevel.Resize(int.Parse(txtMapSizeX.Text), int.Parse(txtMapSizeY.Text));
+                    Render();
+                }
+            }
+            else if (!LevelLoaded)
+            {
+                currentLevel.Resize(int.Parse(txtMapSizeX.Text), int.Parse(txtMapSizeY.Text));
+                Render();
+            }
+        }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void txtMapSizeY_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
+            {
+                int result = 0;
+                if (int.TryParse(txtMapSizeY.Text, out result)) return;
+                else
+                {
+                    MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    txtMapSizeY.Text = currentLevel.Height.ToString();
+                }
+            }
+        }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void txtMapSizeX_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
+            {
+                int result = 0;
+                if (int.TryParse(txtMapSizeX.Text, out result)) return;
+                else
+                {
+                    MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    txtMapSizeX.Text = currentLevel.Height.ToString();
+                }
+            }
+        }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void itmPreventOverlap_Click(object sender, RoutedEventArgs e)
+        {
+            itmPreventOverlap.IsChecked = !itmPreventOverlap.IsChecked;
+        }
+
+        /// <summary>
+        /// COMMENT HERE PLZ
+        /// </summary>
+        private void itmDisableGame_Click(object sender, RoutedEventArgs e)
+        {
+            if (itmDisableGame.IsChecked)
+            {
+                itmDisableGame.IsChecked = false;
+                sepGame.Visibility = Visibility.Visible;
+                btnStart.Visibility = Visibility.Visible;
+                btnEnd.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                if (IsPlaying)
+                {
+                    MessageBox.Show("You must end the current game before disabling gameplay!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                itmDisableGame.IsChecked = true;
+                sepGame.Visibility = Visibility.Hidden;
+                btnStart.Visibility = Visibility.Hidden;
+                btnEnd.Visibility = Visibility.Hidden;
+            }
+
+        }
+        
+        /// <summary>
+        /// Open level menu item click callback: handles opening (finding AND loading) level
+        /// </summary>
+        private void itmOpen_Click(object sender, RoutedEventArgs e)
+        {
+            ////////////////////////////////////////////////////////////
+            // Creates a FileIO instance to allow the user to select
+            // what level to load by allowing the selection of a 
+            // "Level.txt" file
+
+            if (!IsPlaying)
+            {
+                //initialise FileIO as OpenFileDialog
+                FileIO dlgOpen = new FileIO(DialogType.Open, "Open level", "Level File|Level.txt");
+
+                if (dlgOpen.ShowDialog()) //attempt successful use of dialog
+                {
+                    txtLevelDir.Text = dlgOpen.FileName.Substring(0, dlgOpen.FileName.Length - "Level.txt".Length);
+                    btnLoad_Click(null, new RoutedEventArgs());
+                    lblMsg.Text = "Level selected and loaded!";
+                }
+            }
+            else MessageBox.Show("You must end the current game before opening a new level!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        /// <summary>
+        /// Save level menu item click callback: handles saving the level
+        /// </summary>
+        private void itmSave_Click(object sender, RoutedEventArgs e)
+        {
+            ////////////////////////////////////////////////////////////
+            // Creates a FileIO instance to allow the user to select
+            // where they wish to save the level by asking where they 
+            // want the "Level.txt" file to be placed
+
+            if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
+            {
+                //initialise FileIO as SaveFileDialog
+                FileIO dlgSave = new FileIO(DialogType.Save, "Save level", "Level File|Level.txt");
+
+                if (dlgSave.ShowDialog()) //attempt successful use of dialog
+                {
+                    if (File.Exists(dlgSave.FileName)) //check if level already exists before overwriting, then prompt user if they wish to continue
+                    {
+                        MessageBoxResult msgResult = MessageBox.Show("A level already exists in this directory. Do you wish to overwrite it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        if (msgResult == MessageBoxResult.No) return;
+                    }
+                    CLevelParser.ExportLevel(currentLevel, dlgSave.FileName.Substring(0, dlgSave.FileName.Length - "Level.txt".Length));
+                    CLevelParser.ExportTextures(gameTextures, dlgSave.FileName.Substring(0, dlgSave.FileName.Length - "Level.txt".Length));
+                    lblMsg.Text = "Level saved!";
+                }
             }
         }
     }

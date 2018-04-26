@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\CW-ToolDev2\JewelThief\obj\Debug\
+E:\Coursework\CW-ToolDev2\JewelThief\obj\Debug\
 JewelThief
 none
 false
 DEBUG;TRACE
-D:\CW-ToolDev2\JewelThief\App.xaml
-11151548125
+E:\Coursework\CW-ToolDev2\JewelThief\App.xaml
+22112506696
 
-171042367122
+181237878521
 14-1001767708
-MainWindow.xaml;
+AboutWindow.xaml;MainWindow.xaml;
 
 True
 
