@@ -342,7 +342,6 @@ namespace WizardDungeon
             
         }
 
-
         //****************************************************************//
         // This event handler is used to start the game.                 *//
         //****************************************************************//
@@ -755,7 +754,7 @@ namespace WizardDungeon
         /// <summary>
         /// Checks and prompts if a fire entity exists in the position specified
         /// </summary>
-        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <param name="posToCheck">Map position that is to be checked</param>
         /// <returns>Returns a boolean that flags if the user wishes to continue the placement of the new item or entity or not</returns>
         private bool ReplaceIfFireExistsAtPos(CPoint2i posToCheck)
         {
@@ -778,7 +777,7 @@ namespace WizardDungeon
         /// <summary>
         /// Checks and prompts if a enemy entity exists in the position specified
         /// </summary>
-        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <param name="posToCheck">Map position that is to be checked</param>
         /// <returns>Returns a boolean that flags if the user wishes to continue the placement of the new item or entity or not</returns>
         private bool ReplaceIfEnemyExistsAtPos(CPoint2i posToCheck)
         {
@@ -801,7 +800,7 @@ namespace WizardDungeon
         /// <summary>
         /// Checks and prompts if the start position exists in the position specified
         /// </summary>
-        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <param name="posToCheck">Map position that is to be checked</param>
         /// <returns>Returns a boolean that flags whether a start position exists at the specified pos or not</returns>
         private bool CheckIfStartExistsAtPos(CPoint2i posToCheck)
         {
@@ -817,7 +816,7 @@ namespace WizardDungeon
         /// <summary>
         /// Checks and prompts if the goal position exists in the position specified
         /// </summary>
-        /// <param name="posToCheck"Map position that is to be checked></param>
+        /// <param name="posToCheck">Map position that is to be checked</param>
         /// <returns>Returns a boolean that flags whether a goal position exists at the specified pos or not</returns>
         private bool CheckIfGoalExistsAtPos(CPoint2i posToCheck)
         {
@@ -958,17 +957,22 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Time limit textbox text changed callback: handles when user enters text into this textbox
         /// </summary>
         private void txtTimeLimit_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // To prevent the user from entering string characters into
+            // this text box, this method will attempt to parse the string
+            // into an integer - if successful, the method doesn't do
+            // anything else, but if not successful, the method will
+            // prompt the user and reset the text to the current
+            // level's time limit
+
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 int result = 0;
-                if (int.TryParse(txtTimeLimit.Text, out result))
-                {
-                    currentLevel.Time = result;
-                }
+                if (int.TryParse(txtTimeLimit.Text, out result)) currentLevel.Time = result;
                 else
                 {
                     MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -978,21 +982,22 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Save level button clicked callback: handles user saving the level
         /// </summary>
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: ENSURE SAVE CANNOT BE MADE IF NO START OR GOAL POSITION IS SET
-            
+            ////////////////////////////////////////////////////////////
+            // Attempts to the save the level to the provided directory
+
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
-                if (txtLevelDir.Text == "")
+                if (txtLevelDir.Text == "") //check if a directory is specified, exit method and prompt user if so
                 {
                     MessageBox.Show("Please specify a valid directory and file!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                if (File.Exists(txtLevelDir.Text + "\\level.txt"))
+                if (File.Exists(txtLevelDir.Text + "\\level.txt")) //check if level already exists before overwriting, then prompt user if they wish to continue
                 {
                     MessageBoxResult msgResult = MessageBox.Show("A level already exists in this directory. Do you wish to overwrite it?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (msgResult == MessageBoxResult.No) return;
@@ -1008,10 +1013,13 @@ namespace WizardDungeon
         /// </summary>
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e) { if (e.Source is Canvas && e.Key == Key.Down) e.Handled = true; }
 
+        /// <summary>
+        /// Menu bar keydown callback: prevents down arrow key from selecting controls, which might interfer with gameplay
+        /// </summary>
         private void barMenu_PreviewKeyDown(object sender, KeyEventArgs e) { if (e.Source is Canvas && e.Key == Key.Down) e.Handled = true; }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// About menu item clicked callback: handles user displaying the about box
         /// </summary>
         private void itmAbout_Click(object sender, RoutedEventArgs e)
         {
@@ -1020,32 +1028,40 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Set map size button clicked callback: handles user setting a new map size
         /// </summary>
         private void btnSetSize_Click(object sender, RoutedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // Allows the user to resize the make with the two given
+            // size values in txtMapSizeX and txtMapSizeY
+
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
+                //prompt the user that this is a potentially-destructive action
                 MessageBoxResult msgResult = MessageBox.Show("Performing this action can potentially lead to entities being removed from the board. Do you wish to proceed?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (msgResult == MessageBoxResult.No) return;
+                if (msgResult == MessageBoxResult.No) return; //exit method if the user doesn't wish to continue
                 else
                 {
                     currentLevel.Resize(int.Parse(txtMapSizeX.Text), int.Parse(txtMapSizeY.Text));
                     Render();
                 }
             }
-            else if (!LevelLoaded)
-            {
-                currentLevel.Resize(int.Parse(txtMapSizeX.Text), int.Parse(txtMapSizeY.Text));
-                Render();
-            }
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Map size height textbox text changed callback: handles when user enters text into this textbox
         /// </summary>
         private void txtMapSizeY_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // To prevent the user from entering string characters into
+            // this text box, this method will attempt to parse the string
+            // into an integer - if successful, the method doesn't do
+            // anything else, but if not successful, the method will
+            // prompt the user and reset the text to the current
+            // level's height
+
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 int result = 0;
@@ -1059,10 +1075,18 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Map size width textbox text changed callback: handles when user enters text into this textbox
         /// </summary>
         private void txtMapSizeX_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // To prevent the user from entering string characters into
+            // this text box, this method will attempt to parse the string
+            // into an integer - if successful, the method doesn't do
+            // anything else, but if not successful, the method will
+            // prompt the user and reset the text to the current
+            // level's width
+
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 int result = 0;
@@ -1070,24 +1094,26 @@ namespace WizardDungeon
                 else
                 {
                     MessageBox.Show("Cannot accept non-numeric values!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    txtMapSizeX.Text = currentLevel.Height.ToString();
+                    txtMapSizeX.Text = currentLevel.Width.ToString();
                 }
             }
         }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Prevent multiple entities overlapping menu item clicked callback: handles user toggling this option
         /// </summary>
-        private void itmPreventOverlap_Click(object sender, RoutedEventArgs e)
-        {
-            itmPreventOverlap.IsChecked = !itmPreventOverlap.IsChecked;
-        }
+        private void itmPreventOverlap_Click(object sender, RoutedEventArgs e) { itmPreventOverlap.IsChecked = !itmPreventOverlap.IsChecked; }
 
         /// <summary>
-        /// COMMENT HERE PLZ
+        /// Disable gameplay functionality menu item clicked callback: handles user toggling this option
         /// </summary>
         private void itmDisableGame_Click(object sender, RoutedEventArgs e)
         {
+            ////////////////////////////////////////////////////////////
+            // Toggles the disable gameplay option by changing the 
+            // visibility of the buttons responsible for allowing the
+            // player to play the game
+
             if (itmDisableGame.IsChecked)
             {
                 itmDisableGame.IsChecked = false;
@@ -1097,7 +1123,7 @@ namespace WizardDungeon
             }
             else
             {
-                if (IsPlaying)
+                if (IsPlaying) //if the game happens to playing, the program should present the option being used so the user can still end the game manually
                 {
                     MessageBox.Show("You must end the current game before disabling gameplay!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -1112,7 +1138,7 @@ namespace WizardDungeon
         }
         
         /// <summary>
-        /// Open level menu item click callback: handles opening (finding AND loading) level
+        /// Open level menu item clicked callback: handles user opening (finding AND loading) level
         /// </summary>
         private void itmOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -1137,7 +1163,7 @@ namespace WizardDungeon
         }
 
         /// <summary>
-        /// Save level menu item click callback: handles saving the level
+        /// Save level menu item clicked callback: handles user saving the level
         /// </summary>
         private void itmSave_Click(object sender, RoutedEventArgs e)
         {
