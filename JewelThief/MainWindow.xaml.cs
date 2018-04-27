@@ -492,6 +492,26 @@ namespace WizardDungeon
             btnSave.IsEnabled = !IsPlaying;
             btnEnd.IsEnabled = IsPlaying;
             btnFind.IsEnabled = !IsPlaying;
+
+            /////////////////////////////////////////////////////////////
+            // Enable designer elements
+
+            btnSetEnemy.IsEnabled = true;
+            btnSetFire.IsEnabled = true;
+            btnSetFloor.IsEnabled = true;
+            btnSetGoal.IsEnabled = true;
+            btnSetPlayer.IsEnabled = true;
+            btnSetWall.IsEnabled = true;
+            btnSetSize.IsEnabled = true;
+            radEndPos.IsEnabled = true;
+            radEnemyPlacing.IsEnabled = true;
+            radFirePlacing.IsEnabled = true;
+            radOff.IsEnabled = true;
+            radStartPos.IsEnabled = true;
+            radTilePlacing.IsEnabled = true;
+            txtMapSizeY.IsEnabled = true;
+            txtMapSizeX.IsEnabled = true;
+            txtTimeLimit.IsEnabled = true;
         }
 
         /// <summary>
@@ -666,7 +686,7 @@ namespace WizardDungeon
             if (LevelLoaded && !IsPlaying) //ensure level is loaded and game is not playing before proceeding
             {
                 ////////////////////////////////////////////////////////////
-                // get point of click for translating into a tile coord
+                // Get point of click for translating into a tile coord
 
                 Point p = e.GetPosition(cvsMainScreen);
                 CPoint2i pixelPos = new CPoint2i((int)p.X, (int)p.Y);
@@ -675,7 +695,10 @@ namespace WizardDungeon
                 if (radTilePlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    // 
+                    // If the user has flagged they want to toggle-place a tile,
+                    // the method will check what the current type is and attempt
+                    // to flip it after checking if the move conflicts with any
+                    // possible entities placed.
 
                     if (currentLevel.GetTileType(mapPos.X, mapPos.Y) == eTileType.Wall) currentLevel.SetTileType(mapPos.X, mapPos.Y, eTileType.Floor);
                     else
@@ -689,7 +712,9 @@ namespace WizardDungeon
                 else if (radFirePlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    // 
+                    // if the user has flagged they want to place a fire entity,
+                    // the method will fire check if there are any conflicting 
+                    // entities, then use lambda functions what toggle to do
 
                     if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
                     {
@@ -700,7 +725,9 @@ namespace WizardDungeon
                 else if (radEnemyPlacing.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    //
+                    // if the user has flagged they want to place an enemy entity,
+                    // the method will check if there are any conflicting 
+                    // entities, then use lambda functions what toggle to do
 
                     if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
                     {
@@ -711,7 +738,9 @@ namespace WizardDungeon
                 else if (radStartPos.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    //
+                    // if the user has flagged they want to place the start
+                    // position, the method will check if there are any conflicting
+                    // entities, then update the position value
 
                     if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfGoalExistsAtPos(mapPos))
                     { 
@@ -721,7 +750,9 @@ namespace WizardDungeon
                 else if (radEndPos.IsChecked == true)
                 {
                     ////////////////////////////////////////////////////////////
-                    //
+                    // if the user has flagged they want to place the goal
+                    // position, the method will check if there are any conflicting
+                    // entities, then update the position value
 
                     if (!CheckIfWallExistsAtPos(mapPos) && ReplaceIfFireExistsAtPos(mapPos) && ReplaceIfEnemyExistsAtPos(mapPos) && !CheckIfStartExistsAtPos(mapPos))
                     {
@@ -864,26 +895,6 @@ namespace WizardDungeon
             {
                 Render();
                 EndGame(null, "Game ended at user request");
-
-                /////////////////////////////////////////////////////////////
-                // Enable designer elements
-
-                btnSetEnemy.IsEnabled = true;
-                btnSetFire.IsEnabled = true;
-                btnSetFloor.IsEnabled = true;
-                btnSetGoal.IsEnabled = true;
-                btnSetPlayer.IsEnabled = true;
-                btnSetWall.IsEnabled = true;
-                btnSetSize.IsEnabled = true;
-                radEndPos.IsEnabled = true;
-                radEnemyPlacing.IsEnabled = true;
-                radFirePlacing.IsEnabled = true;
-                radOff.IsEnabled = true;
-                radStartPos.IsEnabled = true;
-                radTilePlacing.IsEnabled = true;
-                txtMapSizeY.IsEnabled = true;
-                txtMapSizeX.IsEnabled = true;
-                txtTimeLimit.IsEnabled = true;
             }
         }
 

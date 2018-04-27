@@ -14,7 +14,7 @@ FFFFWFWWWFFF
 FFFFFFWFFFFF
 StartPosition={0, 0}
 GoalPosition={11, 11}
-TimeToComplete=4096
+TimeToComplete=100
 NumEnemies=19
 {7, 3}
 {5, 8}

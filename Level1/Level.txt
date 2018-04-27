@@ -2,7 +2,7 @@ Height=12
 Width=12
 FFFFWFFFWFFF
 FFFFWFFFFFFF
-FFWFWWWFWWWF
+FFFFWWWFWWWF
 FFFFWFFFFFWF
 WWWFWFWFWFWF
 FFFFWFWFWFWF
@@ -25,6 +25,13 @@ NumEnemies=9
 {9, 10}
 {11, 0}
 {3, 3}
-NumFire=2
+NumFire=9
+{8, 1}
+{3, 4}
+{0, 9}
+{4, 11}
+{6, 9}
+{6, 3}
 {11, 9}
 {11, 3}
+{5, 4}
